@@ -3,19 +3,32 @@
 version: 2.1
 
 commands:
-  print_pipeline_id:
+  print_pipeline_id-no-param:
     steps:
       - run: echo ${CIRCLE_WORKFLOW_ID}
-
+      
+  print_pipeline_id-param:
+    parameters:
+      id:
+        type:  string
+    steps:
+      - run: echo << parameters.id >>
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  my_job:
+  my_job-no-param:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - print_pipeline_id
+      - print_pipeline_id-no-param
+  
+  my_job-param:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - print_pipeline_id-param:
+          id: << pipeline.id. >>
 
   say-hello:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
@@ -50,7 +63,8 @@ jobs:
 workflows:
   say-hello-workflow:
     jobs:
-      - my_job
+      - my_job-no-param
+      - my_job-param
       - say-hello
       - save_hello_world_output
       - print_output_file:
