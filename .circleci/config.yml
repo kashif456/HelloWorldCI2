@@ -58,6 +58,17 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: cat ~/output.txt
+
+  error_handling_sample:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - run: exit 1
+      - run:
+          name: on error
+          command: echo "Hello Error!  This Job Failed"
+          when: on_fail
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
@@ -70,4 +81,5 @@ workflows:
       - print_output_file:
           requires:
             - save_hello_world_output
+      - error_handling_sample
     
